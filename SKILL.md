@@ -32,7 +32,7 @@ tags:
 
 **What OpenIFS does:** Research-friendly snapshot of the ECMWF IFS atmospheric model, including the spectral dynamical core, semi-Lagrangian advection, the IFS physics package (radiation, convection, cloud, turbulence, surface), and a single-column model. Used for atmospheric process studies, education, idealized experiments, and as the atmospheric component of EC-Earth and AWI-CM.
 
-**Important license note:** OpenIFS is **not fully open source**. The license restricts use to research and education and prohibits operational use or redistribution. Read `LICENSE` and the ECMWF terms before using or sharing.
+**Important license + access note:** OpenIFS is **not fully open source**. The repo at `github.com/ecmwf-ifs/openifs` requires a signed ECMWF license and an active GitHub invitation; you cannot just `git clone` it as a stranger. The license restricts use to research and education and prohibits operational use or redistribution. Read `LICENSE` and the ECMWF terms before using or sharing.
 
 **Who this skill is for:** Researchers and students using OpenIFS for atmospheric research, with appropriate ECMWF licensing.
 
@@ -113,6 +113,16 @@ OpenIFS uses `ecbundle` (ECMWF's bundle system), `bundle.yml` lists the dependen
 | reference/testing.md | Test infrastructure |
 | reference/debugging.md | Common errors |
 
+## Critical agent gotchas (Gemini-reviewed)
+
+- **Two build eras coexist.** Cycle 43r3 and earlier use a `make`-based system with `arch/` files and `oifs-config.edit_me.sh`. Cycle 48r1+ uses `ecbundle` + CMake (`bundle.yml`). They are not compatible. Identify your cycle first.
+- **`ecbundle` needs `ecbuild`** (ECMWF's CMake wrapper) to actually build. Not always preinstalled.
+- **Climate / fix files and initial state files are required and external.** OpenIFS will crash at startup without topography/land-sea mask climate files and a GRIB initial state. These are multi-GB and downloaded separately from the source.
+- **`fort.4` is the namelist file.** Massive Fortran namelist controlling resolution, time steps, physics. Editing this is unavoidable.
+- **GRIB output requires `eccodes`** (ECMWF's GRIB library + CLI). Without it you cannot inspect or process model output.
+- **Spectral dycore needs FFTW or Intel MKL DFTI.** Per-machine `arch/` files often need manual library paths on modern Linux distros.
+- **Single-column model needs experiment-specific input data** (GABLS, GATE, etc.), not shipped with source.
+
 ## Status
 
-Scaffold (v0.1.0-scaffold). Layout and license model verified against the cloned tree. Operational depth being filled in. Always cross-check with ECMWF Confluence.
+Scaffold (v0.1.0-scaffold). Layout and license model verified against the cloned tree, with Gemini critique pass on 2026-05-09 to add access caveat, build-system disambiguation, and required-input notes. Operational depth being filled in. Always cross-check with ECMWF Confluence.
